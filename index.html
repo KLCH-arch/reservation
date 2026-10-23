@@ -154,10 +154,16 @@
         pets: document.getElementById('pets').value
       };
 
+// 使用 URLSearchParams 送出，能完美避開 Google Apps Script 的跨網域阻擋問題
+      const formData = new URLSearchParams();
+      formData.append("data", JSON.stringify(payload));
+
       fetch(GAS_WEB_APP_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
       })
       .then(res => res.json())
       .then(response => {
@@ -180,6 +186,7 @@
         statusBox.style.display = 'block';
         statusBox.className = 'msg-error';
         statusBox.innerText = '系統連線異常，請稍後再試。';
+        console.error("預約錯誤資訊：", err);
       });
     });
   </script>
