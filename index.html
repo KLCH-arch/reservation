@@ -9,7 +9,7 @@
     body { background-color: #f7f9fa; margin: 0; padding: 20px 16px; color: #333; }
     .card { max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     h2 { margin-top: 0; font-size: 22px; color: #111; text-align: center; }
-    p.subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 24px; }
+    p.subtitle { text-align: center; color: #666; font-size: 13px; margin-bottom: 24px; line-height: 1.5; }
     .form-group { margin-bottom: 18px; }
     label { display: block; font-weight: 600; font-size: 15px; margin-bottom: 8px; color: #333; }
     input, select { width: 100%; height: 48px; border: 1.5px solid #dcdfe6; border-radius: 8px; padding: 0 14px; font-size: 16px; background-color: #fff; outline: none; }
@@ -27,7 +27,11 @@
 <body>
   <div class="card">
     <h2>📅 線上預約訂位</h2>
-    <p class="subtitle">用餐時間 90 分鐘・營業時間 09:30 - 17:30 (17:00為最後點餐時間)</p>
+    <p class="subtitle">
+      營業時間 09:30 - 17:30 (最後點餐 17:00)<br>
+      尖峰用餐限時 90 分鐘<br>
+      地址：花蓮縣壽豐鄉共和村豐坪路三段277號
+    </p>
 
     <form id="bookingForm">
       <div class="form-group">
@@ -63,7 +67,7 @@
           <option value="15:30">15:30</option>
           <option value="16:00">16:00</option>
           <option value="16:30">16:30</option>
-          <option value="17:00">17:00</option>
+          <option value="17:00">17:00 (最後點餐時段)</option>
         </select>
       </div>
 
@@ -79,8 +83,6 @@
             <option value="6">6 位</option>
             <option value="7">7 位</option>
             <option value="8">8 位</option>
-            <option value="9">9 位</option>
-            <option value="10">10 位</option>
           </select>
         </div>
         <div class="form-group">
@@ -91,8 +93,6 @@
             <option value="2">2 位</option>
             <option value="3">3 位</option>
             <option value="4">4 位</option>
-            <option value="5">5 位</option>
-            <option value="6">6 位</option>
           </select>
         </div>
       </div>
@@ -115,9 +115,7 @@
   </div>
 
   <script>
-    // ==========================================
-    // 請將下方引號內換成你的 GAS 網頁應用程式網址 (/exec)
-    // ==========================================
+    // 替換為你的 GAS /exec 網址
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzxYOFypH780IKitgtpUctBTOFgtpuEG04fzMzl0J_V53B9gg31YT0O3ldylhHDVu-u/exec";
 
     const datePicker = document.getElementById('date');
@@ -154,15 +152,12 @@
         pets: document.getElementById('pets').value
       };
 
-// 使用 URLSearchParams 送出，能完美避開 Google Apps Script 的跨網域阻擋問題
       const formData = new URLSearchParams();
       formData.append("data", JSON.stringify(payload));
 
       fetch(GAS_WEB_APP_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: formData.toString()
       })
       .then(res => res.json())
@@ -173,7 +168,7 @@
 
         if (response.success) {
           statusBox.className = 'msg-success';
-          statusBox.innerHTML = `<b>🎉 預約成功！</b><br>預約姓名：${payload.name}<br>預約時段：${payload.date} ${payload.time}<br>人數：${payload.people} 位<br>期待為您服務！`;
+          statusBox.innerHTML = `<b>🎉 預約成功！</b><br>預約姓名：${payload.name}<br>預約時段：${payload.date} ${payload.time}<br>用餐總人數：${payload.people} 位（大人 ${adults}、小孩 ${children}）<br>攜帶寵物：${payload.pets}<br>期待為您服務！`;
           document.getElementById('bookingForm').reset();
         } else {
           statusBox.className = 'msg-error';
@@ -186,7 +181,6 @@
         statusBox.style.display = 'block';
         statusBox.className = 'msg-error';
         statusBox.innerText = '系統連線異常，請稍後再試。';
-        console.error("預約錯誤資訊：", err);
       });
     });
   </script>
